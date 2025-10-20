@@ -1,0 +1,19 @@
+{
+  "projectName": "ai-in-the-browser",
+  "mode": "file-router",
+  "typescript": true,
+  "tailwind": true,
+  "packageManager": "npm",
+  "addOnOptions": {},
+  "git": true,
+  "version": 1,
+  "framework": "react-cra",
+  "chosenAddOns": [
+    "eslint",
+    "start",
+    "tanstack-query",
+    "form",
+    "tanchat",
+    "store"
+  ]
+}
