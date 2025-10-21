@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WebLlmRouteImport } from './routes/web-llm'
 import { Route as TranslatorRouteImport } from './routes/translator'
+import { Route as PromptApiRouteImport } from './routes/prompt-api'
 import { Route as LanguageDetectorRouteImport } from './routes/language-detector'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -22,6 +23,11 @@ const WebLlmRoute = WebLlmRouteImport.update({
 const TranslatorRoute = TranslatorRouteImport.update({
   id: '/translator',
   path: '/translator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PromptApiRoute = PromptApiRouteImport.update({
+  id: '/prompt-api',
+  path: '/prompt-api',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LanguageDetectorRoute = LanguageDetectorRouteImport.update({
@@ -38,12 +44,14 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/language-detector': typeof LanguageDetectorRoute
+  '/prompt-api': typeof PromptApiRoute
   '/translator': typeof TranslatorRoute
   '/web-llm': typeof WebLlmRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/language-detector': typeof LanguageDetectorRoute
+  '/prompt-api': typeof PromptApiRoute
   '/translator': typeof TranslatorRoute
   '/web-llm': typeof WebLlmRoute
 }
@@ -51,20 +59,33 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/language-detector': typeof LanguageDetectorRoute
+  '/prompt-api': typeof PromptApiRoute
   '/translator': typeof TranslatorRoute
   '/web-llm': typeof WebLlmRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/language-detector' | '/translator' | '/web-llm'
+  fullPaths:
+    | '/'
+    | '/language-detector'
+    | '/prompt-api'
+    | '/translator'
+    | '/web-llm'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/language-detector' | '/translator' | '/web-llm'
-  id: '__root__' | '/' | '/language-detector' | '/translator' | '/web-llm'
+  to: '/' | '/language-detector' | '/prompt-api' | '/translator' | '/web-llm'
+  id:
+    | '__root__'
+    | '/'
+    | '/language-detector'
+    | '/prompt-api'
+    | '/translator'
+    | '/web-llm'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LanguageDetectorRoute: typeof LanguageDetectorRoute
+  PromptApiRoute: typeof PromptApiRoute
   TranslatorRoute: typeof TranslatorRoute
   WebLlmRoute: typeof WebLlmRoute
 }
@@ -83,6 +104,13 @@ declare module '@tanstack/react-router' {
       path: '/translator'
       fullPath: '/translator'
       preLoaderRoute: typeof TranslatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/prompt-api': {
+      id: '/prompt-api'
+      path: '/prompt-api'
+      fullPath: '/prompt-api'
+      preLoaderRoute: typeof PromptApiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/language-detector': {
@@ -105,6 +133,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LanguageDetectorRoute: LanguageDetectorRoute,
+  PromptApiRoute: PromptApiRoute,
   TranslatorRoute: TranslatorRoute,
   WebLlmRoute: WebLlmRoute,
 }
