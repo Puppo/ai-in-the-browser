@@ -240,7 +240,6 @@ This project is open source and available under the [MIT License](LICENSE).
 If you encounter any issues or have questions:
 
 - Open an issue on [GitHub](https://github.com/Puppo/ai-in-the-browser/issues)
-- Check the [documentation](https://github.com/Puppo/ai-in-the-browser/docs)
 
 ## 🌟 Show Your Support
 
