@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WebLlmRouteImport } from './routes/web-llm'
+import { Route as LanguageDetectorRouteImport } from './routes/language-detector'
 import { Route as IndexRouteImport } from './routes/index'
 
 const WebLlmRoute = WebLlmRouteImport.update({
   id: '/web-llm',
   path: '/web-llm',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LanguageDetectorRoute = LanguageDetectorRouteImport.update({
+  id: '/language-detector',
+  path: '/language-detector',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -25,27 +31,31 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/language-detector': typeof LanguageDetectorRoute
   '/web-llm': typeof WebLlmRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/language-detector': typeof LanguageDetectorRoute
   '/web-llm': typeof WebLlmRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/language-detector': typeof LanguageDetectorRoute
   '/web-llm': typeof WebLlmRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/web-llm'
+  fullPaths: '/' | '/language-detector' | '/web-llm'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/web-llm'
-  id: '__root__' | '/' | '/web-llm'
+  to: '/' | '/language-detector' | '/web-llm'
+  id: '__root__' | '/' | '/language-detector' | '/web-llm'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LanguageDetectorRoute: typeof LanguageDetectorRoute
   WebLlmRoute: typeof WebLlmRoute
 }
 
@@ -56,6 +66,13 @@ declare module '@tanstack/react-router' {
       path: '/web-llm'
       fullPath: '/web-llm'
       preLoaderRoute: typeof WebLlmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/language-detector': {
+      id: '/language-detector'
+      path: '/language-detector'
+      fullPath: '/language-detector'
+      preLoaderRoute: typeof LanguageDetectorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -70,6 +87,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LanguageDetectorRoute: LanguageDetectorRoute,
   WebLlmRoute: WebLlmRoute,
 }
 export const routeTree = rootRouteImport

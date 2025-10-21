@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router'
 
 import {
   BotMessageSquare,
+  HatGlasses,
   Home,
   Menu,
   X
@@ -74,6 +75,19 @@ export default function Header() {
           >
             <BotMessageSquare size={20} />
             <span className="font-medium">Web LLM</span>
+          </Link>
+
+          <Link
+            to="/language-detector"
+            onClick={() => setIsOpen(false)}
+            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
+            activeProps={{
+              className:
+                'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
+            }}
+          >
+            <HatGlasses size={20} />
+            <span className="font-medium">Language Detector</span>
           </Link>
         </nav>
       </aside>
