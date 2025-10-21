@@ -1,339 +1,251 @@
-Welcome to your new TanStack app! 
+# 🤖 AI in the Browser
 
-# Getting Started
+A comprehensive showcase of modern browser-based AI capabilities, demonstrating how powerful AI models can run directly in your web browser without any server-side processing.
 
-To run this application:
+## 🚀 Overview
 
-```bash
-npm install
-npm run start
-```
+This project demonstrates four different AI capabilities that run entirely in your browser:
 
-# Building For Production
+1. **WebLLM Chat** - Run large language models using WebAssembly and WebGPU
+2. **Prompt API** - Interact with browser-native AI language models
+3. **Translator** - Real-time language translation using browser APIs
+4. **Language Detector** - Automatically detect the language of input text
 
-To build this application for production:
-
-```bash
-npm run build
-```
-
-## Testing
-
-This project uses [Vitest](https://vitest.dev/) for testing. You can run the tests with:
-
-```bash
-npm run test
-```
-
-## Styling
-
-This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
-
-
-## Linting & Formatting
-
-
-This project uses [eslint](https://eslint.org/) and [prettier](https://prettier.io/) for linting and formatting. Eslint is configured using [tanstack/eslint-config](https://tanstack.com/config/latest/docs/eslint). The following scripts are available:
-
-```bash
-npm run lint
-npm run format
-npm run check
-```
-
-
-# TanStack Chat Application
-
-Am example chat application built with TanStack Start, TanStack Store, and Claude AI.
-
-## .env Updates
-
-```env
-ANTHROPIC_API_KEY=your_anthropic_api_key
-```
+All features leverage cutting-edge web technologies to provide private, fast, and offline-capable AI experiences.
 
 ## ✨ Features
 
-### AI Capabilities
-- 🤖 Powered by Claude 3.5 Sonnet 
-- 📝 Rich markdown formatting with syntax highlighting
-- 🎯 Customizable system prompts for tailored AI behavior
-- 🔄 Real-time message updates and streaming responses (coming soon)
+### 🔮 WebLLM Chat
 
-### User Experience
-- 🎨 Modern UI with Tailwind CSS and Lucide icons
-- 🔍 Conversation management and history
-- 🔐 Secure API key management
-- 📋 Markdown rendering with code highlighting
+- Run open-source LLMs directly in your browser
+- Powered by [MLC AI's WebLLM](https://github.com/mlc-ai/web-llm)
+- Multiple model options (TinyLlama, Llama 2, Mistral, etc.)
+- WebGPU acceleration for optimal performance
+- Complete privacy - no data leaves your device
 
-### Technical Features
-- 📦 Centralized state management with TanStack Store
-- 🔌 Extensible architecture for multiple AI providers
-- 🛠️ TypeScript for type safety
+### 💬 Prompt API
 
-## Architecture
+- Use browser's built-in Prompt API
+- Streaming responses for real-time interaction
+- Markdown rendering with syntax highlighting
+- Copy message functionality
+- Customizable prompts and parameters
 
-### Tech Stack
-- **Frontend Framework**: TanStack Start
-- **Routing**: TanStack Router
-- **State Management**: TanStack Store
-- **Styling**: Tailwind CSS
-- **AI Integration**: Anthropic's Claude API
+### 🌍 Translator
 
+- Browser-native translation API
+- Support for multiple languages
+- Instant translation without server requests
+- Clean, intuitive UI
 
-## Routing
-This project uses [TanStack Router](https://tanstack.com/router). The initial setup is a file based router. Which means that the routes are managed as files in `src/routes`.
+### 🔍 Language Detector
 
-### Adding A Route
+- Automatic language detection
+- Confidence scoring
+- Supports text analysis in multiple languages
+- Built on browser's native language detection API
 
-To add a new route to your application just add another a new file in the `./src/routes` directory.
+## 🛠️ Tech Stack
 
-TanStack will automatically generate the content of the route file for you.
+- **Framework**: [React 19](https://react.dev/) with [TanStack Router](https://tanstack.com/router)
+- **Build Tool**: [Vite](https://vitejs.dev/)
+- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
+- **AI Libraries**:
+  - [@mlc-ai/web-llm](https://www.npmjs.com/package/@mlc-ai/web-llm) - WebLLM for running LLMs
+  - Browser native AI APIs (Prompt API, Translator API, Language Detector API)
+- **Type Safety**: TypeScript
+- **Code Quality**: ESLint & Prettier
 
-Now that you have two routes you can use a `Link` component to navigate between them.
+## 📋 Prerequisites
 
-### Adding Links
+Before you begin, ensure you have the following installed:
 
-To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
+- **Node.js** (v18 or higher)
+- **npm** or **yarn** or **pnpm**
+- A modern browser that supports:
+  - WebGPU (for WebLLM) - Chrome/Edge 113+, Firefox 123+
+  - Prompt API (experimental in Chrome Canary)
+  - Translation API (Chrome/Edge)
+  - Language Detector API (Chrome/Edge)
 
-```tsx
-import { Link } from "@tanstack/react-router";
-```
+### Browser Compatibility Notes
 
-Then anywhere in your JSX you can use it like so:
+- **WebLLM**: Requires WebGPU support (Chrome 113+, Edge 113+, Firefox 123+)
+- **Prompt API**: Currently experimental - requires Chrome Canary with flags enabled
+- **Translator API**: Available in Chrome 99+ and Edge 99+
+- **Language Detector API**: Available in Chrome 99+ and Edge 99+
 
-```tsx
-<Link to="/about">About</Link>
-```
+## 🚀 Getting Started
 
-This will create a link that will navigate to the `/about` route.
-
-More information on the `Link` component can be found in the [Link documentation](https://tanstack.com/router/v1/docs/framework/react/api/router/linkComponent).
-
-### Using A Layout
-
-In the File Based Routing setup the layout is located in `src/routes/__root.tsx`. Anything you add to the root route will appear in all the routes. The route content will appear in the JSX where you use the `<Outlet />` component.
-
-Here is an example layout that includes a header:
-
-```tsx
-import { Outlet, createRootRoute } from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
-
-import { Link } from "@tanstack/react-router";
-
-export const Route = createRootRoute({
-  component: () => (
-    <>
-      <header>
-        <nav>
-          <Link to="/">Home</Link>
-          <Link to="/about">About</Link>
-        </nav>
-      </header>
-      <Outlet />
-      <TanStackRouterDevtools />
-    </>
-  ),
-})
-```
-
-The `<TanStackRouterDevtools />` component is not required so you can remove it if you don't want it in your layout.
-
-More information on layouts can be found in the [Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
-
-
-## Data Fetching
-
-There are multiple ways to fetch data in your application. You can use TanStack Query to fetch data from a server. But you can also use the `loader` functionality built into TanStack Router to load the data for a route before it's rendered.
-
-For example:
-
-```tsx
-const peopleRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/people",
-  loader: async () => {
-    const response = await fetch("https://swapi.dev/api/people");
-    return response.json() as Promise<{
-      results: {
-        name: string;
-      }[];
-    }>;
-  },
-  component: () => {
-    const data = peopleRoute.useLoaderData();
-    return (
-      <ul>
-        {data.results.map((person) => (
-          <li key={person.name}>{person.name}</li>
-        ))}
-      </ul>
-    );
-  },
-});
-```
-
-Loaders simplify your data fetching logic dramatically. Check out more information in the [Loader documentation](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#loader-parameters).
-
-### React-Query
-
-React-Query is an excellent addition or alternative to route loading and integrating it into you application is a breeze.
-
-First add your dependencies:
+### 1. Clone the Repository
 
 ```bash
-npm install @tanstack/react-query @tanstack/react-query-devtools
+git clone https://github.com/Puppo/ai-in-the-browser.git
+cd ai-in-the-browser
 ```
 
-Next we'll need to create a query client and provider. We recommend putting those in `main.tsx`.
-
-```tsx
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
-// ...
-
-const queryClient = new QueryClient();
-
-// ...
-
-if (!rootElement.innerHTML) {
-  const root = ReactDOM.createRoot(rootElement);
-
-  root.render(
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
-  );
-}
-```
-
-You can also add TanStack Query Devtools to the root route (optional).
-
-```tsx
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-
-const rootRoute = createRootRoute({
-  component: () => (
-    <>
-      <Outlet />
-      <ReactQueryDevtools buttonPosition="top-right" />
-      <TanStackRouterDevtools />
-    </>
-  ),
-});
-```
-
-Now you can use `useQuery` to fetch your data.
-
-```tsx
-import { useQuery } from "@tanstack/react-query";
-
-import "./App.css";
-
-function App() {
-  const { data } = useQuery({
-    queryKey: ["people"],
-    queryFn: () =>
-      fetch("https://swapi.dev/api/people")
-        .then((res) => res.json())
-        .then((data) => data.results as { name: string }[]),
-    initialData: [],
-  });
-
-  return (
-    <div>
-      <ul>
-        {data.map((person) => (
-          <li key={person.name}>{person.name}</li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-export default App;
-```
-
-You can find out everything you need to know on how to use React-Query in the [React-Query documentation](https://tanstack.com/query/latest/docs/framework/react/overview).
-
-## State Management
-
-Another common requirement for React applications is state management. There are many options for state management in React. TanStack Store provides a great starting point for your project.
-
-First you need to add TanStack Store as a dependency:
+### 2. Install Dependencies
 
 ```bash
-npm install @tanstack/store
+npm install
+# or
+yarn install
+# or
+pnpm install
 ```
 
-Now let's create a simple counter in the `src/App.tsx` file as a demonstration.
+### 3. Start the Development Server
 
-```tsx
-import { useStore } from "@tanstack/react-store";
-import { Store } from "@tanstack/store";
-import "./App.css";
-
-const countStore = new Store(0);
-
-function App() {
-  const count = useStore(countStore);
-  return (
-    <div>
-      <button onClick={() => countStore.setState((n) => n + 1)}>
-        Increment - {count}
-      </button>
-    </div>
-  );
-}
-
-export default App;
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
 ```
 
-One of the many nice features of TanStack Store is the ability to derive state from other state. That derived state will update when the base state updates.
+The application will be available at `http://localhost:3000`.
 
-Let's check this out by doubling the count using derived state.
+### 4. Build for Production
 
-```tsx
-import { useStore } from "@tanstack/react-store";
-import { Store, Derived } from "@tanstack/store";
-import "./App.css";
-
-const countStore = new Store(0);
-
-const doubledStore = new Derived({
-  fn: () => countStore.state * 2,
-  deps: [countStore],
-});
-doubledStore.mount();
-
-function App() {
-  const count = useStore(countStore);
-  const doubledCount = useStore(doubledStore);
-
-  return (
-    <div>
-      <button onClick={() => countStore.setState((n) => n + 1)}>
-        Increment - {count}
-      </button>
-      <div>Doubled - {doubledCount}</div>
-    </div>
-  );
-}
-
-export default App;
+```bash
+npm run build
+# or
+yarn build
+# or
+pnpm build
 ```
 
-We use the `Derived` class to create a new store that is derived from another store. The `Derived` class has a `mount` method that will start the derived store updating.
+### 5. Preview Production Build
 
-Once we've created the derived store we can use it in the `App` component just like we would any other store using the `useStore` hook.
+```bash
+npm run serve
+# or
+yarn serve
+# or
+pnpm serve
+```
 
-You can find out everything you need to know on how to use TanStack Store in the [TanStack Store documentation](https://tanstack.com/store/latest).
+## 📁 Project Structure
 
-# Demo files
+```
+ai-in-the-browser/
+├── src/
+│   ├── routes/              # Application routes
+│   │   ├── index.tsx        # Home page
+│   │   ├── web-llm.tsx      # WebLLM chat interface
+│   │   ├── prompt-api.tsx   # Prompt API interface
+│   │   ├── translator.tsx   # Translation interface
+│   │   └── language-detector.tsx  # Language detection interface
+│   ├── components/          # Reusable UI components
+│   │   ├── ChatWindow.tsx   # Chat interface component
+│   │   ├── Header.tsx       # App header
+│   │   ├── LoadingState.tsx # Loading indicators
+│   │   └── ModelSelector.tsx # LLM model selector
+│   ├── hooks/               # Custom React hooks
+│   │   ├── useWebLLM.ts     # WebLLM integration
+│   │   ├── usePromptApi.ts  # Prompt API integration
+│   │   ├── useTranslator.ts # Translator API integration
+│   │   └── useLanguageDetection.ts # Language detector integration
+│   ├── services/            # Business logic and API services
+│   ├── providers/           # React context providers
+│   ├── contexts/            # React contexts
+│   ├── utils/               # Utility functions
+│   └── types/               # TypeScript type definitions
+├── public/                  # Static assets
+├── docs/                    # Documentation
+└── package.json
+```
 
-Files prefixed with `demo` can be safely deleted. They are there to provide a starting point for you to play around with the features you've installed.
+## 🎯 Usage
 
-# Learn More
+### WebLLM Chat
 
-You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).
+1. Navigate to `/web-llm`
+2. Select a model from the sidebar (first time will download the model)
+3. Wait for the model to load (this may take a few minutes on first run)
+4. Start chatting with the AI!
+
+**Note**: First-time model downloads can be large (500MB - 4GB depending on the model). The model is cached in your browser for subsequent uses.
+
+### Prompt API
+
+1. Navigate to `/prompt-api`
+2. Check if the API is available in your browser
+3. Type your prompt in the input field
+4. Press Enter or click Send to get AI responses
+5. Responses support Markdown formatting with syntax highlighting
+
+### Translator
+
+1. Navigate to `/translator`
+2. Select source and target languages
+3. Enter text to translate
+4. Click the "Translate" button
+5. View the translated result instantly
+
+### Language Detector
+
+1. Navigate to `/language-detector`
+2. Enter text in any language
+3. Click "Detect Language"
+4. View the detected language with confidence score
+
+## 🔧 Configuration
+
+### Enabling Experimental Features
+
+For features like Prompt API that are experimental, you may need to enable them in your browser:
+
+#### Chrome/Edge Flags
+
+1. Navigate to `chrome://flags` (or `edge://flags`)
+2. Search for "Prompt API for Gemini Nano"
+3. Enable the flag
+4. Restart your browser
+
+## 📜 Available Scripts
+
+- `npm run dev` - Start development server on port 3000
+- `npm run build` - Build for production
+- `npm run serve` - Preview production build
+- `npm run lint` - Run ESLint
+- `npm run format` - Run Prettier
+- `npm run check` - Format and fix linting issues
+- `npm test` - Run tests with Vitest
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+## 🙏 Acknowledgments
+
+- [MLC AI](https://mlc.ai/) for WebLLM
+- [TanStack](https://tanstack.com/) for amazing React libraries
+- [Tailwind CSS](https://tailwindcss.com/) for styling
+- The Chrome team for experimental AI APIs
+
+## 📞 Support
+
+If you encounter any issues or have questions:
+
+- Open an issue on [GitHub](https://github.com/Puppo/ai-in-the-browser/issues)
+- Check the [documentation](https://github.com/Puppo/ai-in-the-browser/docs)
+
+## 🌟 Show Your Support
+
+If you find this project useful, please consider giving it a ⭐️ on GitHub!
+
+---
+
+**Note**: This is a demonstration project showcasing emerging browser AI capabilities. Some features are experimental and may not work in all browsers. Always check browser compatibility before deploying to production.
