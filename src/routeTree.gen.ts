@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WebLlmRouteImport } from './routes/web-llm'
+import { Route as TranslatorRouteImport } from './routes/translator'
 import { Route as LanguageDetectorRouteImport } from './routes/language-detector'
 import { Route as IndexRouteImport } from './routes/index'
 
 const WebLlmRoute = WebLlmRouteImport.update({
   id: '/web-llm',
   path: '/web-llm',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TranslatorRoute = TranslatorRouteImport.update({
+  id: '/translator',
+  path: '/translator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LanguageDetectorRoute = LanguageDetectorRouteImport.update({
@@ -32,30 +38,34 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/language-detector': typeof LanguageDetectorRoute
+  '/translator': typeof TranslatorRoute
   '/web-llm': typeof WebLlmRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/language-detector': typeof LanguageDetectorRoute
+  '/translator': typeof TranslatorRoute
   '/web-llm': typeof WebLlmRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/language-detector': typeof LanguageDetectorRoute
+  '/translator': typeof TranslatorRoute
   '/web-llm': typeof WebLlmRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/language-detector' | '/web-llm'
+  fullPaths: '/' | '/language-detector' | '/translator' | '/web-llm'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/language-detector' | '/web-llm'
-  id: '__root__' | '/' | '/language-detector' | '/web-llm'
+  to: '/' | '/language-detector' | '/translator' | '/web-llm'
+  id: '__root__' | '/' | '/language-detector' | '/translator' | '/web-llm'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LanguageDetectorRoute: typeof LanguageDetectorRoute
+  TranslatorRoute: typeof TranslatorRoute
   WebLlmRoute: typeof WebLlmRoute
 }
 
@@ -66,6 +76,13 @@ declare module '@tanstack/react-router' {
       path: '/web-llm'
       fullPath: '/web-llm'
       preLoaderRoute: typeof WebLlmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/translator': {
+      id: '/translator'
+      path: '/translator'
+      fullPath: '/translator'
+      preLoaderRoute: typeof TranslatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/language-detector': {
@@ -88,6 +105,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LanguageDetectorRoute: LanguageDetectorRoute,
+  TranslatorRoute: TranslatorRoute,
   WebLlmRoute: WebLlmRoute,
 }
 export const routeTree = rootRouteImport
