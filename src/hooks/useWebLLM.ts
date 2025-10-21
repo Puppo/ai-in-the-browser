@@ -124,7 +124,7 @@ export function useWebLLM(options: UseWebLLMOptions = {}) {
           timestamp: Date.now(),
         }
 
-        setMessages((prev) => [...prev, userMsg, assistantMsg])
+        setMessages((prev) => [...prev, assistantMsg])
         setError(null)
       } catch (err) {
         if (err instanceof Error && err.name === 'AbortError') {
