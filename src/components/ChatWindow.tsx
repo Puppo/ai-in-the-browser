@@ -1,6 +1,7 @@
-import { AlertCircle, Check, Copy, Loader, Send, Trash2 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
-import type { ChatMessage } from '../hooks/useWebLLM'
+import { AlertCircle, Check, Copy, Loader, Send, Trash2 } from 'lucide-react';
+import { memo, useEffect, useRef, useState } from 'react';
+import type { ChatMessage } from '@/types/chat';
+import { convertMarkdownToHtml } from '@/utils/markdown';
 
 interface ChatWindowProps {
   messages: Array<ChatMessage>
@@ -9,6 +10,17 @@ interface ChatWindowProps {
   onSendMessage: (message: string) => void
   onClearMessages: () => void
 }
+
+const MarkdownMessage = memo(function({ content }: { content: string }) {
+  const html = convertMarkdownToHtml(content)
+
+  return (
+    <div 
+      className="prose prose-invert prose-sm max-w-none prose-pre:bg-slate-800 prose-pre:border prose-pre:border-slate-600"
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  )
+})
 
 export function ChatWindow({
   messages,
@@ -81,8 +93,12 @@ export function ChatWindow({
                     : 'bg-slate-700 text-slate-100 rounded-bl-none'
                 }`}
               >
-                <div className="text-sm leading-relaxed wrap-break-word">
-                  {message.content}
+                <div className="text-sm leading-relaxed">
+                  {message.role === 'user' ? (
+                    <div className="whitespace-pre-wrap wrap-break-word">{message.content}</div>
+                  ) : (
+                    <MarkdownMessage content={message.content} />
+                  )}
                 </div>
                 <button
                   onClick={() => copyToClipboard(message.content, message.id)}
@@ -108,9 +124,13 @@ export function ChatWindow({
         {isGenerating && (
           <div className="flex justify-start">
             <div className="bg-slate-700 text-slate-100 px-4 py-3 rounded-lg rounded-bl-none">
-              <div className="flex items-center gap-2">
-                <Loader className="w-4 h-4 animate-spin" />
-                <span className="text-sm">Generating response...</span>
+              <div className="flex items-center gap-3">
+                <div className="flex gap-1">
+                  <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                  <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                  <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                </div>
+                <span className="text-sm text-slate-300">AI is thinking...</span>
               </div>
             </div>
           </div>
@@ -128,7 +148,7 @@ export function ChatWindow({
 
       {/* Input Area */}
       <div className="border-t border-slate-700 bg-slate-800 p-4">
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-stretch">
           <textarea
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
@@ -141,7 +161,7 @@ export function ChatWindow({
           <button
             onClick={handleSend}
             disabled={!inputValue.trim() || isGenerating}
-            className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white rounded-lg px-4 py-2 transition-colors flex items-center justify-center h-full"
+            className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white rounded-lg px-4 transition-colors flex items-center justify-center self-stretch"
           >
             {isGenerating ? (
               <Loader className="w-5 h-5 animate-spin" />

@@ -1,15 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { PromptApiContext } from '../contexts/PromptApiContext';
 import { PromptApiService } from '../services/promptApiService';
-import type { PromptApiContextValue } from '../contexts/PromptApiContext';
+import type { ChatMessage } from '@/types/chat';
 import type { ReactNode } from 'react';
-
-export type ChatMessage = {
-  readonly id: string;
-  readonly type: 'user' | 'assistant';
-  readonly text: string;
-  readonly timestamp: Date;
-}
+import type { PromptApiContextValue } from '../contexts/PromptApiContext';
 
 interface PromptApiProviderProps {
   readonly children: ReactNode;
@@ -110,7 +104,7 @@ export function PromptApiProvider({
         const lastMessage = newMessages[newMessages.length - 1];
         newMessages[newMessages.length - 1] = {
           ...lastMessage,
-          text: lastMessage.text + text
+          content: lastMessage.content + text
         };
       }
       return newMessages;
@@ -122,9 +116,9 @@ export function PromptApiProvider({
 
     const userMessage: ChatMessage = {
       id: `user-${++messageIdCounter.current}`,
-      type: 'user',
-      text: message.trim(),
-      timestamp: new Date()
+      role: 'user',
+      content: message.trim(),
+      timestamp: new Date().getTime(),
     };
 
     addMessage(userMessage);
@@ -136,9 +130,9 @@ export function PromptApiProvider({
 
       const assistantMessage: ChatMessage = {
         id: `assistant-${++messageIdCounter.current}`,
-        type: 'assistant',
-        text: response,
-        timestamp: new Date()
+        role: 'assistant',
+        content: response,
+        timestamp: new Date().getTime(),
       };
 
       addMessage(assistantMessage);
@@ -156,9 +150,9 @@ export function PromptApiProvider({
 
     const userMessage: ChatMessage = {
       id: `user-${++messageIdCounter.current}`,
-      type: 'user',
-      text: message.trim(),
-      timestamp: new Date()
+      role: 'user',
+      content: message.trim(),
+      timestamp: new Date().getTime(),
     };
 
     addMessage(userMessage);
@@ -171,9 +165,9 @@ export function PromptApiProvider({
 
     const assistantMessage: ChatMessage = {
       id: assistantMessageId,
-      type: 'assistant',
-      text: '',
-      timestamp: new Date()
+      role: 'assistant',
+      content: '',
+      timestamp: new Date().getTime(),
     };
 
     addMessage(assistantMessage);

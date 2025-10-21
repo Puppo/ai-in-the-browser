@@ -69,11 +69,11 @@ export class PromptApiService {
     const reader = stream.getReader();
     
     try {
-      while (true) {
-        const { done, value } = await reader.read();
+      let { done, value } = await reader.read(); 
+      do {
         if (done) break;
-        onChunk(value);
-      }
+        value && onChunk(value);
+      } while (!done && ({ done, value } = await reader.read()));
     } finally {
       reader.releaseLock();
     }

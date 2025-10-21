@@ -1,12 +1,6 @@
 import * as webllm from '@mlc-ai/web-llm'
 import { useCallback, useEffect, useRef, useState } from 'react'
-
-export interface ChatMessage {
-  id: string
-  role: 'user' | 'assistant'
-  content: string
-  timestamp: number
-}
+import type { ChatMessage } from '@/providers/PromptApiProvider'
 
 export interface UseWebLLMOptions {
   model?: string
