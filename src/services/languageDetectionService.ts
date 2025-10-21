@@ -48,24 +48,14 @@ export class LanguageDetectionService {
     return langCode.split('-')[0].toLowerCase();
   }
 
-  async detectLanguage(text: string): Promise<string> {
+  async detectLanguage(text: string): Promise<Array<LanguageDetectionResult>> {
     try {
       await this.initializeDetector();
 
-      const detections = await this.detector?.detect(text) ?? [];
-
-      const bestDetection = detections.find(d => (d.confidence ?? 0) > 0.5 && d.detectedLanguage);
-
-      if (bestDetection?.detectedLanguage) {
-        const normalized = this.normalizeLanguageCode(bestDetection.detectedLanguage);
-        console.log(`Detected language: ${normalized} (confidence: ${bestDetection.confidence})`);
-        return normalized;
-      }
-      
-      return 'en';
+      return (await this.detector?.detect(text))?.filter(result => (result.confidence ?? 0) > 0.4) ?? [];
     } catch (error) {
       console.error('Recipe language detection failed:', error);
-      return 'en';
+      return []
     }
   }
 

@@ -17,7 +17,7 @@ export function LanguageDetectionProvider({
   autoInitialize = true,
   onError
 }: LanguageDetectionProviderProps) {
-  const [detectedLanguage, setDetectedLanguage] = useState<string | null>(null);
+  const [detectedLanguage, setDetectedLanguage] = useState<Array<LanguageDetectionResult>>([]);
   const [isDetecting, setIsDetecting] = useState(false);
   const [detectionError, setDetectionError] = useState<string | null>(null);
   const [supportsLanguageDetection, setSupportsLanguageDetection] = useState<LanguageDetectionSupport>('detecting');
@@ -62,7 +62,6 @@ export function LanguageDetectionProvider({
     }
   }, [supportsLanguageDetection, onError]);
 
-  // Auto-initialize if requested
   useEffect(() => {
     if (autoInitialize && supportsLanguageDetection === 'detected' && !hasAutoInitialized.current) {
       hasAutoInitialized.current = true;
@@ -70,9 +69,9 @@ export function LanguageDetectionProvider({
     }
   }, [autoInitialize, supportsLanguageDetection, initializeDetector]);
 
-  const detectLanguage = useCallback(async (text: string): Promise<string> => {
+  const detectLanguage = useCallback(async (text: string): Promise<Array<LanguageDetectionResult>> => {
     if (supportsLanguageDetection !== 'detected') {
-      return 'en';
+      return [];
     }
 
     try {
@@ -88,7 +87,7 @@ export function LanguageDetectionProvider({
       setDetectionError(errorMessage);
       console.error('Recipe language detection failed:', err);
       onError?.(err instanceof Error ? err : new Error(errorMessage));
-      return 'en';
+      return [];
     } finally {
       setIsDetecting(false);
     }

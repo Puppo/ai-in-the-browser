@@ -1,31 +1,16 @@
 import { useForm } from '@tanstack/react-form'
 import { createFileRoute } from '@tanstack/react-router'
-import { useContext, useState } from 'react'
-import { LanguageDetectionContext } from '../contexts/LanguageDetectionContext'
+import { useState } from 'react'
+import { useLanguageDetection } from '../hooks/useLanguageDetection'
 import { LanguageDetectionProvider } from '../providers/LanguageDetectionProvider'
 
 export const Route = createFileRoute('/language-detector')({
   component: RouteComponent,
 })
 
-type FormValues = {
-  text: string
-}
-
-interface DetectionResult {
-  language: string
-  confidence?: number
-}
-
 function LanguageDetectorContent() {
-  const languageContext = useContext(LanguageDetectionContext)
-  const [result, setResult] = useState<DetectionResult | null>(null)
-
-  if (!languageContext) {
-    return <div className="text-red-600">Error: Language Detection Context not available</div>
-  }
-
-  const { detectLanguage, isDetecting, detectionError, supportsLanguageDetection } = languageContext
+  const { detectLanguage, isDetecting, detectionError, supportsLanguageDetection } = useLanguageDetection()
+  const [result, setResult] = useState<Array<LanguageDetectionResult> | null>(null)
 
   const form = useForm({
     defaultValues: {
@@ -34,16 +19,10 @@ function LanguageDetectorContent() {
     onSubmit: async ({ value }) => {
       try {
         const detectedLang = await detectLanguage(value.text)
-        setResult({
-          language: detectedLang,
-          confidence: 0.95,
-        })
+        setResult(detectedLang)
       } catch (error) {
         console.error('Detection failed:', error)
-        setResult({
-          language: 'Error',
-          confidence: 0,
-        })
+        setResult([])
       }
     },
   })
@@ -171,40 +150,47 @@ function LanguageDetectorContent() {
           </form>
 
           {/* Results */}
-          {result && !isDetecting && (
+          {result && result.length > 0 && !isDetecting && (
             <div className="mt-8 pt-8 border-t border-slate-200">
               <h2 className="text-lg font-semibold text-slate-900 mb-4">
-                Detection Result
+                Detection Results
               </h2>
-              <div className="bg-linear-to-r from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-600 font-medium">Language:</span>
-                    <span className="text-2xl font-bold text-blue-600">
-                      {result.language}
-                    </span>
-                  </div>
-                  {result.confidence !== undefined && result.confidence > 0 && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-slate-600 font-medium">
-                        Confidence:
-                      </span>
-                      <div className="flex items-center gap-2">
-                        <div className="w-32 bg-slate-300 rounded-full h-2">
-                          <div
-                            className="bg-green-500 h-2 rounded-full transition-all duration-300"
-                            style={{
-                              width: `${(result.confidence || 0) * 100}%`,
-                            }}
-                          />
-                        </div>
-                        <span className="text-slate-900 font-semibold">
-                          {((result.confidence || 0) * 100).toFixed(1)}%
+              <div className="space-y-3">
+                {result.map((detection, index) => (
+                  <div 
+                    key={index}
+                    className="bg-linear-to-r from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200"
+                  >
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-600 font-medium">Language:</span>
+                        <span className="text-2xl font-bold text-blue-600">
+                          {detection.detectedLanguage}
                         </span>
                       </div>
+                      {detection.confidence && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-600 font-medium">
+                            Confidence:
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <div className="w-32 bg-slate-300 rounded-full h-2">
+                              <div
+                                className="bg-green-500 h-2 rounded-full transition-all duration-300"
+                                style={{
+                                  width: `${(detection.confidence || 0) * 100}%`,
+                                }}
+                              />
+                            </div>
+                            <span className="text-slate-900 font-semibold">
+                              {((detection.confidence || 0) * 100).toFixed(1)}%
+                            </span>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}
