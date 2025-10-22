@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
 import { Brain, Layers, Zap } from 'lucide-react'
 
 export const Route = createFileRoute('/')({ component: App })
@@ -41,16 +41,20 @@ function App() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-            <button
+            <Link
+              to="/web-llm"
               className="px-8 py-4 bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold rounded-lg transition-all shadow-lg shadow-blue-600/50 hover:shadow-blue-600/75 text-lg"
             >
               Begin the Journey
-            </button>
-            <button
+            </Link>
+            <a
+              href="https://developer.chrome.com/docs/ai/built-in"
+              target="_blank"
+              rel="noopener noreferrer"
               className="px-8 py-4 border-2 border-purple-500 text-purple-300 hover:bg-purple-500/10 font-bold rounded-lg transition-all text-lg"
             >
               Learn More
-            </button>
+            </a>
           </div>
 
           {/* Features Grid */}
