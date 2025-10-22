@@ -1,52 +1,60 @@
-class TranslatorService {
-  private readonly languageTranslators = new Map<string, Translator>();
-  private readonly translationCache = new Map<string, string>();
+interface TranslatorKey {
+  readonly sourceLanguage: string;
+  readonly targetLanguage: string;
+}
 
-  get languageMap(): Record<string, Translator> {
+export class TranslatorService {
+  private readonly languageTranslators = new Map<`${string}-${string}`, Translator>();
+
+  get languageMap(): Partial<Record<`${string}-${string}`, Translator>> {
     return Object.fromEntries(this.languageTranslators);
   }
 
   async isTranslationBetweenLanguagesSupported(
-    sourceLanguage: string,
-    targetLanguage: string
+    keys: TranslatorKey
   ): Promise<string> {
     if (!('Translator' in self)) return 'unavailable';
     
     try {
-      return await Translator.availability({ sourceLanguage, targetLanguage });
+      return await Translator.availability(keys);
     } catch {
       return 'unavailable';
     }
   }
 
-  setTranslator(languageCode: string, translator: Translator): void {
-    this.languageTranslators.set(languageCode, translator);
+  setTranslator({ sourceLanguage, targetLanguage }: TranslatorKey, translator: Translator): void {
+    this.languageTranslators.set(`${sourceLanguage}-${targetLanguage}`, translator);
   }
 
-  async translateText(text: string, targetLanguage: string): Promise<string> {
-    if (targetLanguage === 'en') return text;
+  async loadTranslator({ sourceLanguage, targetLanguage }: TranslatorKey): Promise<Translator | null> {
+    const translator = this.languageTranslators.get(`${sourceLanguage}-${targetLanguage}`) || null;
+    if (translator) return translator;
+    const newTranslator = await Translator.create({
+      sourceLanguage,
+      targetLanguage,
+      monitor: (monitor) => {
+        monitor.addEventListener('downloadprogress', (event) => {
+          console.log(`Translator download progress: ${event.loaded} / ${event.total}`);
+        });
+      },
+    });
+    this.setTranslator({ sourceLanguage, targetLanguage }, newTranslator);
+    return newTranslator;
+  }
 
-    const cacheKey = `${text}|${targetLanguage}`;
-    const cached = this.translationCache.get(cacheKey);
-    if (cached) return cached;
-
-    const translator = this.languageTranslators.get(targetLanguage);
+  async translateText(text: string, { sourceLanguage, targetLanguage }: TranslatorKey): Promise<string> {
+    const translator = this.languageTranslators.get(`${sourceLanguage}-${targetLanguage}`);
     if (!translator) {
       throw new Error(`Translator not available for language: ${targetLanguage}`);
     }
 
     const translatedText = await translator.translate(text);
-    this.translationCache.set(cacheKey, translatedText);
     return translatedText;
   }
 
-  async translateArray(texts: Array<string>, targetLanguage: string): Promise<Array<string>> {
-    if (targetLanguage === 'en') return texts;
-    return Promise.all(texts.map(text => this.translateText(text, targetLanguage)));
-  }
-
-  translate(text: string, targetLanguage: string): Promise<string> {
-    return this.translateText(text, targetLanguage);
+  translate(text: string, keys: TranslatorKey): Promise<string> {
+    console.log('Translating text with keys:', keys);
+    return this.translateText(text, keys);
   }
   
 }

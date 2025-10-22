@@ -1,8 +1,8 @@
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { languages } from '../constants/languages';
 import { TranslatorContext } from '../contexts/TranslatorContext';
 import translatorService from '../services/translatorService';
-import type { TranslationStatus, TranslatorContextValue } from '../contexts/TranslatorContext';
+import type { TranslatorContextValue } from '../contexts/TranslatorContext';
 import type { ReactNode } from 'react';
 
 interface TranslationStatusProviderProps {
@@ -14,145 +14,52 @@ export function TranslationProvider({
   children,
   onError
 }: TranslationStatusProviderProps) {
-  const [translations, setTranslations] = useState<Array<TranslationStatus>>(() =>
-    languages.map(lang => ({
-      language: lang.name,
-      languageCode: lang.code,
-      flag: lang.flag,
-      status: lang.code === 'en' ? 'ready' : 'idle'
-    }))
-  );
 
-  const updateTranslationStatus = useCallback((
-    languageCode: string, 
-    updates: Partial<TranslationStatus>
-  ) => {
-    setTranslations(prev => 
-      prev.map(t => 
-        t.languageCode === languageCode 
-          ? { ...t, ...updates }
-          : t
-      )
-    );
-  }, []);
-
-  const calculateEstimatedTime = useCallback((progress: number): string => {
-    if (progress <= 0) return 'Calculating...';
-    if (progress >= 90) return 'Almost done';
-    if (progress >= 50) return '30s';
-    if (progress >= 25) return '1m';
-    return '2m';
-  }, []);
-
-  const initializeTranslator = useCallback(async (languageCode: string) => {
-    if (languageCode === 'en' || translatorService.languageMap[languageCode]) {
+  const initializeTranslator = useCallback(async (sourceLanguageCode: string, targetLanguageCode: string) => {
+    if (translatorService.languageMap[`${sourceLanguageCode}-${targetLanguageCode}`]) {
       return;
     }
 
-    const language = languages.find(l => l.code === languageCode);
+    const language = languages.find(l => l.code === targetLanguageCode);
     if (!language) return;
-
+    
     try {
-      updateTranslationStatus(languageCode, { 
-        status: 'checking',
-        error: undefined,
-        dismissed: false
-      });
+      const availability = await translatorService.isTranslationBetweenLanguagesSupported({ sourceLanguage: sourceLanguageCode, targetLanguage: targetLanguageCode });
 
-      const availability = await translatorService.isTranslationBetweenLanguagesSupported('en', languageCode);
-      
       if (availability === 'unavailable') {
         const errorMsg = 'Translation not supported for this language';
-        updateTranslationStatus(languageCode, { 
-          status: 'error',
-          error: errorMsg
-        });
-        console.warn(`Translation from 'en' to '${languageCode}' is not supported ${availability}.`);
-        onError?.(new Error(errorMsg), languageCode);
+        console.warn(`Translation from ${sourceLanguageCode} to ${targetLanguageCode} is not supported ${availability}.`);
+        onError?.(new Error(errorMsg), targetLanguageCode);
         return;
       }
 
-      updateTranslationStatus(languageCode, { 
-        status: 'downloading',
-        progress: 0
-      });
-
-      const translator = await Translator.create({
-        sourceLanguage: 'en',
-        targetLanguage: languageCode,
-        monitor(m) {
-          m.addEventListener('downloadprogress', (e) => {
-            const progress = Math.round(e.loaded * 100);
-            updateTranslationStatus(languageCode, { 
-              progress,
-              downloadSize: e.total ? `${Math.round(e.total / 1024 / 1024)}MB` : undefined,
-              estimatedTime: calculateEstimatedTime(progress)
-            });
-          });
-        },
-      });
-
-      translatorService.setTranslator(languageCode, translator);
-
-      updateTranslationStatus(languageCode, { 
-        status: 'ready',
-        progress: 100
-      });
+      await translatorService.loadTranslator({ sourceLanguage: sourceLanguageCode, targetLanguage: targetLanguageCode });
 
     } catch (err) {
-      console.error(`Failed to initialize translator for ${languageCode}:`, err);
+      console.error(`Failed to initialize translator for ${sourceLanguageCode} to ${targetLanguageCode}:`, err);
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
-      updateTranslationStatus(languageCode, { 
-        status: 'error',
-        error: errorMessage
-      });
-      onError?.(err instanceof Error ? err : new Error(errorMessage), languageCode);
+      onError?.(err instanceof Error ? err : new Error(errorMessage), targetLanguageCode);
     }
-  }, [updateTranslationStatus, calculateEstimatedTime, onError]);
+  }, [onError]);
 
-  const retryTranslator = useCallback(async (languageCode: string) => {
-    updateTranslationStatus(languageCode, { 
-      status: 'idle',
-      error: undefined,
-      progress: undefined,
-      dismissed: false
-    });
-    
-    await initializeTranslator(languageCode);
-  }, [initializeTranslator, updateTranslationStatus]);
+  const retryTranslator = useCallback((sourceLanguageCode: string, targetLanguageCode: string) => initializeTranslator(sourceLanguageCode, targetLanguageCode), [initializeTranslator]);
 
-  const dismissNotification = useCallback((languageCode: string) => {
-    updateTranslationStatus(languageCode, { 
-      dismissed: true
-    });
-  }, [updateTranslationStatus]);
-
-  const clearAllNotifications = useCallback(() => {
-    setTranslations(prev => 
-      prev.map(translation => ({ 
-        ...translation, 
-        dismissed: true 
-      }))
-    );
+  const isTranslatorReady = useCallback((sourceLanguageCode: string, targetLanguageCode: string) => {
+    return !!translatorService.languageMap[`${sourceLanguageCode}-${targetLanguageCode}`];
   }, []);
 
-  const isTranslatorReady = useCallback((languageCode: string) => {
-    return languageCode === 'en' || !!translatorService.languageMap[languageCode];
-  }, []);
-
-  const getTranslationProgress = useCallback((languageCode: string) => {
-    const translation = translations.find(t => t.languageCode === languageCode);
-    return translation?.progress ?? 0;
-  }, [translations]);
+  const translate = useCallback(async (text: string, {
+    sourceLanguageCode,
+    targetLanguageCode
+  }: {sourceLanguageCode: string, targetLanguageCode: string}): Promise<string> => {
+    return (await translatorService.languageMap[`${sourceLanguageCode}-${targetLanguageCode}`]?.translate(text)) ?? ''
+  }, [])
 
   const value: TranslatorContextValue = {
-    translations,
     initializeTranslator,
     retryTranslator,
-    dismissNotification,
-    clearAllNotifications,
     isTranslatorReady,
-    getTranslationProgress
+    translate
   };
 
   return (

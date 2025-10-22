@@ -37,7 +37,13 @@ export class LanguageDetectionService {
       throw new Error('Language detection is not available in this browser');
     }
 
-    this.detector = await LanguageDetector.create();
+    this.detector = await LanguageDetector.create({
+      monitor: (monitor) => {
+        monitor.addEventListener('downloadprogress', (event) => {
+          console.log(`LanguageDetector download progress: ${event.loaded} / ${event.total}`);
+        });
+      }
+    });
   }
 
   private normalizeLanguageCode(langCode: string): string {

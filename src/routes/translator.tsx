@@ -1,26 +1,19 @@
 import { useForm } from '@tanstack/react-form'
 import { createFileRoute } from '@tanstack/react-router'
-import { useContext, useState } from 'react'
+import { useState } from 'react'
 import { languages } from '../constants/languages'
-import { TranslatorContext } from '../contexts/TranslatorContext'
 import { TranslationProvider } from '../providers/TranslatorProvider'
-import translatorService from '../services/translatorService'
+import { useTranslator } from '@/hooks/useTranslator'
 
 export const Route = createFileRoute('/translator')({
   component: RouteComponent,
 })
 
 function TranslatorContent() {
-  const translatorContext = useContext(TranslatorContext)
+  const { initializeTranslator, isTranslatorReady, translate } = useTranslator()
   const [translatedText, setTranslatedText] = useState<string>('')
   const [isTranslating, setIsTranslating] = useState<boolean>(false)
   const [translationError, setTranslationError] = useState<string>('')
-
-  if (!translatorContext) {
-    return <div className="text-red-600">Error: Translator Context not available</div>
-  }
-
-  const { initializeTranslator, isTranslatorReady } = translatorContext
 
   const form = useForm({
     defaultValues: {
@@ -34,12 +27,12 @@ function TranslatorContent() {
       
       try {
         // Initialize translator if not ready
-        if (!isTranslatorReady(value.targetLanguage)) {
-          await initializeTranslator(value.targetLanguage)
+        if (!isTranslatorReady(value.sourceLanguage, value.targetLanguage)) {
+          await initializeTranslator(value.sourceLanguage, value.targetLanguage)
         }
 
         // Perform translation
-        const result = await translatorService.translateText(value.text, value.targetLanguage)
+        const result = await translate(value.text, { sourceLanguageCode: value.sourceLanguage, targetLanguageCode: value.targetLanguage })
         setTranslatedText(result)
       } catch (error) {
         console.error('Translation failed:', error)
