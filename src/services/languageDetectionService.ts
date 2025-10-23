@@ -21,12 +21,14 @@ export class LanguageDetectionService {
     // Already initializing
     if (this.initPromise) {
       await this.initPromise;
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       return this.detector !== null;
     }
 
     // Start initialization
     this.initPromise = this.doInitialize();
     await this.initPromise;
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     return this.detector !== null;
   }
 
