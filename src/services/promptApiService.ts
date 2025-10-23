@@ -4,7 +4,7 @@ export class PromptApiService {
 
   async checkAvailability(): Promise<Availability> {
     try {
-      return await LanguageModel?.availability() ?? 'unavailable';
+      return await LanguageModel.availability();
     } catch {
       return 'unavailable';
     }
@@ -70,10 +70,10 @@ export class PromptApiService {
     
     try {
       let { done, value } = await reader.read(); 
-      do {
-        if (done) break;
-        value && onChunk(value);
-      } while (!done && ({ done, value } = await reader.read()));
+      while (!done) {
+        if (value) onChunk(value);
+        ({ done, value } = await reader.read());
+      }
     } finally {
       reader.releaseLock();
     }
